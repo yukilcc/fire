@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温暖的祝福</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        video {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .popup {
+            position: fixed;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease-out;
+            width: 160px;
+            height: 50px;
+            text-align: center;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .popup.hide-heart {
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.8s ease-in;
+        }
+
+        .popup.random-show {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.4s ease-out;
+        }
+
+        .popup.random-hide {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <video id="fireworks" autoplay loop muted playsinline>
+        <source src="firework.mp4" type="video/mp4">
+    </video>
+    <div id="popups-container"></div>
+
+    <script>
+        const messages = [
+            "笑口常开 🌸",
+            "天天好心情 🌈",
+            "保持微笑 🍯",
+            "心情要美好 🌺",
+            "快乐很简单 🎈",
+            "记得开心呀 💖",
+            "今日宜微笑 ☀️",
+            "心暖如阳光 🌻",
+            "烦恼都抛开 🍯",
+            "嘴角上扬吧 🍯",
+            "心里藏彩虹 🍯",
+            "快乐不缺席 🎉",
+            "好事会发生 ✨",
+            "记得要温暖 🍯",
+            "每天好一点 🍯",
+            "心情放个假 🍯",
+            "轻松过日子 🍀",
+            "微笑最有力量 💪",
+            "心头有光芒 ⭐",
+            "今日份开心 🍯",
+            "简单就快乐 😄",
+            "记得笑一笑 😁",
+            "心里有花开 🌸",
+            "阳光满怀抱 ☀️",
+            "幸福在身边 💗",
+            "温柔待自己 🍯",
+            "一切会更好 🌟",
+            "别忘小确幸 💫",
+            "快乐不打烊 🍯",
+            "心向暖阳开 🍯",
+            "每天甜甜的 🍯",
+            "心情是晴天 ☀️",
+            "快乐常相伴 ☀️",
+            "微笑最治愈 💝",
+            "记得爱自己 ☀️",
+            "心静享安宁 🕊️",
+            "今日小欢喜 ☀️",
+            "让心去飞翔 🦋",
+            "拥抱好时光 ☀️",
+            "嘴角弯弯哟 ☀️",
+            "心里有暖风 🌬️",
+            "好事在靠近 🌟",
+            "快乐由心生 ☀️",
+            "微笑胜万言 ☀️",
+            "心若晴朗 🌤️",
+            "日日是好日 📅",
+            "记得放轻松 🍃",
+            "心田种快乐 ☀️",
+            "今日乐呵呵 😄",
+            "心情美美的 💕",
+            "让快乐延续 💖",
+            "暖心过每天 ☀️",
+            "微笑是习惯 😊",
+            "心中无阴霾 💖",
+            "每天有惊喜 💖",
+            "快乐很简单 🎈",
+            "记得多笑笑 💖",
+            "心头有暖阳 💖",
+            "嘴角别放下 😊",
+            "好心情常在 💖",
+            "今日要灿烂 ✨",
+            "心随风起舞 🦋",
+            "快乐不设限 💖",
+            "微笑最动人 💖",
+            "记得常欢喜 🎉",
+            "心中有诗意 📝",
+            "每天亮晶晶 ⭐",
+            "心情如花开 🌸",
+            "微笑传递爱 💖",
+            "心向光明行 ☀️",
+            "今日多美好 💖",
+            "让心去旅行 🗺️",
+            "快乐是选择 🎈",
+            "记得抱抱自己 🤗",
+            "心静自然乐 🍀",
+            "每天都可爱 💝",
+            "微笑化春风 💖",
+            "心中有星辰 ⭐",
+            "今日宜快乐 💖",
+            "让心情放晴 🌤️",
+            "快乐会传染 😊",
+            "记得要闪耀 ✨",
+            "心如暖玉温 💎",
+            "每天有盼头 🌟",
+            "微笑如阳光 ☀️",
+            "心里有歌声 🎵",
+            "好事会降临 💖",
+            "记得常微笑 🌺",
+            "心向快乐靠 🌺",
+            "每天都珍贵 💎",
+            "笑容最珍贵 💖",
+            "心中有花园 🌺",
+            "今日宜欢欣 🌺",
+            "让心轻盈飞 🦋",
+            "快乐在身边 🌺",
+            "记得多温暖 🌺",
+            "心若芬芳 🌷",
+            "每天有糖分 🍬",
+            "微笑是良药 🌺",
+            "心头有明月 🌙",
+            "今日要晴朗 🌺",
+            "让心去绽放 🌺",
+            "快乐不迟到 ⏰",
+            "记得善待己 🌺",
+            "心海泛柔波 🌺",
+            "每天都新鲜 🌱",
+            "微笑暖人间 🌍",
+            "心中有彩虹 🌈",
+            "今日乐开怀 😄",
+            "让心情跳舞 💃",
+            "快乐无边际 🌺",
+            "记得多感恩 🙏",
+            "心向暖而生 ☀️",
+            "每天有光芒 ✨",
+            "微笑如花开 🌸",
+            "心里有阳光 ☀️",
+            "好事正赶来 🏃",
+            "记得常乐观 😊",
+            "心随意而安 🌺",
+            "每天都美好 🌺",
+            "笑容有魔力 ✨",
+            "心中有暖流 💧",
+            "今日要开心 🎉",
+            "让心去歌唱 🎵",
+            "快乐是常态 😊",
+            "记得多鼓励 😊",
+            "心平自生欢 😊",
+            "每天有进步 😊",
+            "微笑散芬芳 🌸",
+            "心里有蝴蝶 🦋",
+            "今日好运来 🍀",
+            "让心情盛开 🌺",
+            "快乐不落幕 🎭",
+            "记得多分享 🤝",
+            "心向美而往 💕",
+            "每天有期待 ⭐",
+            "微笑如蜜甜 🍯",
+            "心中有暖灯 😊",
+            "今日笑盈盈 😊",
+            "让心去流浪 🗺️",
+            "快乐永相随 💕",
+            "记得多欣赏 💕",
+            "心净自生悦 💕",
+            "每天有奇迹 ✨",
+            "微笑化冰雪 ❄️",
+            "心里有星光 ⭐",
+            "好事会发生 💕",
+            "记得多放松 🍃",
+            "心宽自得乐 😄",
+            "每天有色彩 💕",
+            "微笑是礼物 🎁",
+            "心中有清泉 💧",
+            "今日要欢畅 🎉",
+            "让心情飞扬 🦋",
+            "快乐很简单 🎈",
+            "记得多陪伴 👫",
+            "心善自生福 🍀",
+            "每天有温暖 ☀️",
+            "微笑如春风 🌸",
+            "心里有晴空 💕",
+            "今日乐悠悠 😊",
+            "让心去探险 🗺️",
+            "快乐不散场 🎉",
+            "记得多包容 🤗",
+            "心安自生喜 💖",
+            "每天有感动 💕",
+            "微笑如朝霞 🌸",
+            "心中有绿洲 🌸",
+            "今日要幸福 🌟",
+            "让心情起航 ⛵",
+            "快乐不褪色 🎨",
+            "记得多赞美 🌸",
+            "心诚自生暖 💝",
+            "每天有希望 ⭐",
+            "微笑如星光 ✨",
+            "心里有暖意 🌸",
+            "好事在发芽 🌸",
+            "记得多关怀 🤗",
+            "心静自生甜 🍯",
+            "每天有微笑 😊",
+            "记得天天开心 🌸"
+        ];
+
+        const fontColors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+            '#F8B500', '#00CED1', '#FF69B4', '#7B68EE', '#20B2AA',
+            '#FF6347', '#40E0D0', '#EE82EE', '#FFD700', '#00FF7F',
+            '#FF1493', '#00BFFF', '#ADFF2F', '#FF4500', '#1E90FF',
+            '#FF69B4', '#32CD32', '#BA55D3', '#FF8C00', '#4169E1',
+            '#DC143C', '#00FA9A', '#9400D3', '#FFA500', '#00CED1',
+            '#FF1493', '#7FFF00', '#FF6347', '#48D1CC', '#C71585'
+        ];
+
+
+
+        function getHeartPositions(count) {
+            const positions = [];
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const scale = Math.min(window.innerWidth, window.innerHeight) * 0.030;
+
+            for (let i = 0; i < count; i++) {
+                const t = (Math.PI * 2 * i) / count;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                
+                positions.push({
+                    x: centerX + x * scale - 90,
+                    y: centerY + y * scale - 25
+                });
+            }
+
+            return positions;
+        }
+
+        function createPopups() {
+            const container = document.getElementById('popups-container');
+            const positions = getHeartPositions(messages.length);
+
+            const popups = messages.map((msg, index) => {
+                const popup = document.createElement('div');
+                popup.className = 'popup';
+                popup.textContent = index === messages.length - 1 ? '记得天天开心 🌸' : msg;
+                popup.style.color = fontColors[index % fontColors.length];
+                popup.style.left = positions[index].x + 'px';
+                popup.style.top = positions[index].y + 'px';
+                container.appendChild(popup);
+                return popup;
+            });
+
+            popups.forEach((popup, index) => {
+                setTimeout(() => {
+                    popup.classList.add('show');
+                }, index * 150);
+            });
+
+            setTimeout(() => {
+                hideHeartPopups(popups);
+            }, messages.length * 150 + 3000);
+        }
+
+        function hideHeartPopups(popups) {
+            popups.forEach(popup => {
+                popup.classList.remove('show');
+                popup.classList.add('hide-heart');
+            });
+
+            setTimeout(() => {
+                popups.forEach(popup => popup.remove());
+                startRandomPopups();
+            }, 1000);
+        }
+
+        const MAX_POPUPS = 150;
+        const POPUP_INTERVAL = 100;
+        let activePopups = [];
+        let messageIndex = 0;
+
+        function startRandomPopups() {
+            setInterval(() => {
+                if (activePopups.length >= MAX_POPUPS) {
+                    const randomIndex = Math.floor(Math.random() * activePopups.length);
+                    const popupToRemove = activePopups[randomIndex];
+                    popupToRemove.classList.remove('random-show');
+                    popupToRemove.classList.add('random-hide');
+                    
+                    setTimeout(() => {
+                        if (popupToRemove.parentNode) {
+                            popupToRemove.remove();
+                        }
+                    }, 400);
+                    
+                    activePopups.splice(randomIndex, 1);
+                }
+
+                createRandomPopup();
+            }, POPUP_INTERVAL);
+        }
+
+        function createRandomPopup() {
+            const container = document.getElementById('popups-container');
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.textContent = messages[messageIndex % messages.length];
+            popup.style.color = fontColors[messageIndex % fontColors.length];
+            
+            const maxX = window.innerWidth - 200;
+            const maxY = window.innerHeight - 80;
+            popup.style.left = Math.random() * maxX + 'px';
+            popup.style.top = Math.random() * maxY + 'px';
+            
+            container.appendChild(popup);
+            activePopups.push(popup);
+
+            setTimeout(() => {
+                popup.classList.add('random-show');
+            }, 50);
+
+            messageIndex++;
+        }
+
+        setTimeout(createPopups, 1000);
+    </script>
+</body>
+</html>
